@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0 , maximum-scale=1.0 , user-scalable=no">
+    <title>Canvas画图</title>
+</head>
+<style>
+    *{
+        padding:0;
+        margin:0;
+        box-sizing: border-box;
+    }
+</style>
+<body>
+    <canvas id="canvas"></canvas>
+</body>
+</html>
+<script>
+    let canvas = document.getElementById('canvas');
+    canvas.width = document.documentElement.clientWidth;
+    canvas.height = document.documentElement.clientHeight;
+
+    let ctx = canvas.getContext("2d");
+    ctx.lineCap = 'round';
+    ctx.lineWidth = 5;
+    let supportTouch = "ontouchstart" in document;
+    console.log(supportTouch);
+    let lastPos = {};
+
+    if(supportTouch){
+        //手机端
+        canvas.ontouchmove = (e)=>{
+            let nowX = e.touches[0].clientX;
+            let nowY = e.touches[0].clientY; 
+            ctx.beginPath();
+            ctx.arc(nowX,nowY,5,0,2*Math.PI)
+            ctx.stroke();
+            ctx.fill();
+        }
+    }else{
+        //电脑端
+        let painting = false;
+        canvas.onmousedown = (e)=>{
+            painting = true;
+            lastPos = {
+                lastX:e.clientX,
+                lastY:e.clientY
+            }
+        }
+
+        canvas.onmousemove = (e)=>{
+            let nowX = e.clientX;
+            let nowY = e.clientY;
+
+            if(painting){
+                drawLine(nowX,nowY,lastPos.lastX,lastPos.lastY);
+            }
+
+            lastPos = {
+                lastX:e.clientX,
+                lastY:e.clientY
+            }
+        }
+
+        canvas.onmouseup = (e)=>{
+            painting = false;
+        }
+    }
+
+    function drawLine(x1,y1,x2,y2){
+        ctx.beginPath();
+        ctx.moveTo(x1, y1);
+        ctx.lineTo(x2, y2);
+        ctx.closePath();
+        ctx.stroke();
+    }
+</script>
